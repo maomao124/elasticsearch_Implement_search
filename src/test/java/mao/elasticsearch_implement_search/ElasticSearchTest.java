@@ -874,7 +874,7 @@ public class ElasticSearchTest
         SearchRequest searchRequest = new SearchRequest("book");
         //构建请求体
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //查询某字段
+        //查询
         searchSourceBuilder.query(QueryBuilders.matchAllQuery());
         //分页
         searchSourceBuilder.from(1);
@@ -972,7 +972,7 @@ public class ElasticSearchTest
         SearchRequest searchRequest = new SearchRequest("book");
         //构建请求体
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //查询某字段
+        //查询
         searchSourceBuilder.query(QueryBuilders.matchAllQuery());
         //分页
         searchSourceBuilder.from(1);
@@ -1033,5 +1033,111 @@ public class ElasticSearchTest
         });
         //休眠2秒
         Thread.sleep(2000);
+    }
+
+    /**
+     * 查询，返回指定的字段
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *   "query":
+     *   {
+     *     "match_all": {}
+     *   },
+     *   "_source": ["name","price"]
+     * }
+     *
+     * </pre>
+     *
+     * 结果：
+     * <pre>
+     *
+     * 总数量：5
+     *
+     *
+     * id:1
+     * score:1.0
+     * 内容：
+     * ---- price：38.6
+     * ---- name：Bootstrap开发
+     * ----------------------------------
+     *
+     * id:2
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- name：java编程思想
+     * ----------------------------------
+     *
+     * id:3
+     * score:1.0
+     * 内容：
+     * ---- price：78.6
+     * ---- name：spring开发基础
+     * ----------------------------------
+     *
+     * id:5
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- name：java编程思想
+     * ----------------------------------
+     *
+     * id:6
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- name：java编程思想
+     * ----------------------------------
+     *
+     * </pre>
+     *
+     * @throws Exception Exception
+     */
+    @Test
+    void search_field() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        //指定某些字段
+        searchSourceBuilder.fetchSource(new String[]{"name", "price"}, new String[]{});
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起请求
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        //获取数据
+        SearchHits hits = searchResponse.getHits();
+        //总数
+        long value = hits.getTotalHits().value;
+        System.out.println("总数量：" + value);
+        System.out.println();
+        SearchHit[] hitsHits = hits.getHits();
+        //遍历数据
+        for (SearchHit hitsHit : hitsHits)
+        {
+            System.out.println();
+            //获得id
+            String id = hitsHit.getId();
+            //获得得分
+            float score = hitsHit.getScore();
+            //获得内容
+            Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+            //打印内容
+            System.out.println("id:" + id);
+            System.out.println("score:" + score);
+            System.out.println("内容：");
+            for (String key : sourceAsMap.keySet())
+            {
+                System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+            }
+            System.out.println("----------------------------------");
+        }
     }
 }
