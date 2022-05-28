@@ -3652,4 +3652,133 @@ public class ElasticSearchTest
         //休眠2秒
         Thread.sleep(2000);
     }
+
+
+    /**
+     * regexp query
+     * 正则查询
+     * 查询某字段满足某正则表达式的所有数据
+     *
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *     "query":
+     *     {
+     *       "regexp":
+     *       {
+     *         "description":
+     *         {
+     *           "value": "j.*a",
+     *           "flags": "ALL"
+     *         }
+     *       }
+     *     }
+     * }
+     *
+     * 结果：
+     * <pre>
+     *
+     * 总数量：4
+     * 最大分数：1.0
+     *
+     *
+     * id:2
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-25 19:11:35
+     * ---- tags：[java, dev]
+     * ----------------------------------
+     *
+     * id:3
+     * score:1.0
+     * 内容：
+     * ---- price：78.6
+     * ---- studymodel：201001
+     * ---- name：spring开发基础
+     * ---- description：spring 在java领域非常流行，java程序员都在用。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-24 19:21:35
+     * ---- tags：[spring, java]
+     * ----------------------------------
+     *
+     * id:5
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2022-5-25 19:11:35
+     * ---- tags：[bootstrap, dev]
+     * ----------------------------------
+     *
+     * id:6
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2022-5-25 19:11:35
+     * ---- tags：[bootstrap, dev]
+     * ----------------------------------
+     *
+     * </pre>
+     *
+     * </pre>
+     * @throws Exception
+     */
+    @Test
+    void search_regexp_query() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询
+        searchSourceBuilder.query(QueryBuilders.regexpQuery("description","j.*a"));
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起请求
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        //获取数据
+        SearchHits hits = searchResponse.getHits();
+        //总数
+        long value = hits.getTotalHits().value;
+        System.out.println("总数量：" + value);
+        float maxScore = hits.getMaxScore();
+        System.out.println("最大分数：" + maxScore);
+        System.out.println();
+        SearchHit[] hitsHits = hits.getHits();
+        //遍历数据
+        for (SearchHit hitsHit : hitsHits)
+        {
+            System.out.println();
+            //获得id
+            String id = hitsHit.getId();
+            //获得得分
+            float score = hitsHit.getScore();
+            //获得内容
+            Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+            //打印内容
+            System.out.println("id:" + id);
+            System.out.println("score:" + score);
+            System.out.println("内容：");
+            for (String key : sourceAsMap.keySet())
+            {
+                System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+            }
+            System.out.println("----------------------------------");
+        }
+    }
 }
