@@ -1,0 +1,20 @@
+2022-05-28 23:15:38.083  INFO 21236 --- [main] .ElasticsearchImplementSearchApplication : Starting ElasticsearchImplementSearchApplication v0.0.1-SNAPSHOT using Java 16.0.2 on mao with PID 21236 (H:\程序\大三下期\elasticsearch实现搜索功能\target\elasticsearch_Implement_search-0.0.1-SNAPSHOT.jar started by mao in H:\程序\大三下期\elasticsearch实现搜索功能\target)
+2022-05-28 23:15:38.086 DEBUG 21236 --- [main] .ElasticsearchImplementSearchApplication : Running with Spring Boot v2.7.0, Spring v5.3.20
+2022-05-28 23:15:38.087  INFO 21236 --- [main] .ElasticsearchImplementSearchApplication : The following 1 profile is active: "dev"
+2022-05-28 23:15:39.320  INFO 21236 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-05-28 23:15:39.332  INFO 21236 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-05-28 23:15:39.332  INFO 21236 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-05-28 23:15:39.415  INFO 21236 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-05-28 23:15:39.415  INFO 21236 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1257 ms
+2022-05-28 23:15:40.233  INFO 21236 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-05-28 23:15:40.247  INFO 21236 --- [main] .ElasticsearchImplementSearchApplication : Started ElasticsearchImplementSearchApplication in 2.83 seconds (JVM running for 3.333)
+2022-05-28 23:16:06.166  INFO 17708 --- [main] .ElasticsearchImplementSearchApplication : Starting ElasticsearchImplementSearchApplication v0.0.1-SNAPSHOT using Java 16.0.2 on mao with PID 17708 (H:\程序\大三下期\elasticsearch实现搜索功能\target\elasticsearch_Implement_search-0.0.1-SNAPSHOT.jar started by mao in H:\程序\大三下期\elasticsearch实现搜索功能\target)
+2022-05-28 23:16:06.169 DEBUG 17708 --- [main] .ElasticsearchImplementSearchApplication : Running with Spring Boot v2.7.0, Spring v5.3.20
+2022-05-28 23:16:06.170  INFO 17708 --- [main] .ElasticsearchImplementSearchApplication : The following 1 profile is active: "dev"
+2022-05-28 23:16:07.338  INFO 17708 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-05-28 23:16:07.351  INFO 17708 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-05-28 23:16:07.351  INFO 17708 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-05-28 23:16:07.470  INFO 17708 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-05-28 23:16:07.470  INFO 17708 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1238 ms
+2022-05-28 23:16:08.270  INFO 17708 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-05-28 23:16:08.284  INFO 17708 --- [main] .ElasticsearchImplementSearchApplication : Started ElasticsearchImplementSearchApplication in 2.716 seconds (JVM running for 3.206)
