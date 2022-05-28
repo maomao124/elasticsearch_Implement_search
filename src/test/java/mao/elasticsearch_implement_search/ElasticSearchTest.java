@@ -815,4 +815,223 @@ public class ElasticSearchTest
         //休眠2秒
         Thread.sleep(2000);
     }
+
+    /**
+     * 分页查询
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *   "query":
+     *   {
+     *     "match_all": {}
+     *   },
+     *   "from": 1,
+     *   "size": 2
+     * }
+     *
+     * </pre>
+     * <p>
+     * 结果：
+     * <pre>
+     *
+     * 总数量：5
+     *
+     *
+     * id:2
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-25 19:11:35
+     * ---- tags：[java, dev]
+     * ----------------------------------
+     *
+     * id:3
+     * score:1.0
+     * 内容：
+     * ---- price：78.6
+     * ---- studymodel：201001
+     * ---- name：spring开发基础
+     * ---- description：spring 在java领域非常流行，java程序员都在用。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-24 19:21:35
+     * ---- tags：[spring, java]
+     * ----------------------------------
+     *
+     * </pre>
+     *
+     * @throws Exception Exception
+     */
+    @Test
+    void search_page() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询某字段
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        //分页
+        searchSourceBuilder.from(1);
+        searchSourceBuilder.size(2);
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起请求
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        //获取数据
+        SearchHits hits = searchResponse.getHits();
+        //总数
+        long value = hits.getTotalHits().value;
+        System.out.println("总数量：" + value);
+        System.out.println();
+        SearchHit[] hitsHits = hits.getHits();
+        //遍历数据
+        for (SearchHit hitsHit : hitsHits)
+        {
+            System.out.println();
+            //获得id
+            String id = hitsHit.getId();
+            //获得得分
+            float score = hitsHit.getScore();
+            //获得内容
+            Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+            //打印内容
+            System.out.println("id:" + id);
+            System.out.println("score:" + score);
+            System.out.println("内容：");
+            for (String key : sourceAsMap.keySet())
+            {
+                System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+            }
+            System.out.println("----------------------------------");
+        }
+    }
+
+
+    /**
+     * 分页查询，异步
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *   "query":
+     *   {
+     *     "match_all": {}
+     *   },
+     *   "from": 1,
+     *   "size": 2
+     * }
+     *
+     * </pre>
+     * <p>
+     * 结果：
+     * <pre>
+     *
+     * 总数量：5
+     *
+     *
+     * id:2
+     * score:1.0
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-25 19:11:35
+     * ---- tags：[java, dev]
+     * ----------------------------------
+     *
+     * id:3
+     * score:1.0
+     * 内容：
+     * ---- price：78.6
+     * ---- studymodel：201001
+     * ---- name：spring开发基础
+     * ---- description：spring 在java领域非常流行，java程序员都在用。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-24 19:21:35
+     * ---- tags：[spring, java]
+     * ----------------------------------
+     *
+     * </pre>
+     *
+     * @throws Exception Exception
+     */
+    @Test
+    void search_page_async() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询某字段
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        //分页
+        searchSourceBuilder.from(1);
+        searchSourceBuilder.size(2);
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起异步请求
+        client.searchAsync(searchRequest, RequestOptions.DEFAULT, new ActionListener<SearchResponse>()
+        {
+            /**
+             * 成功的回调
+             *
+             * @param searchResponse SearchResponse
+             */
+            @Override
+            public void onResponse(SearchResponse searchResponse)
+            {
+                //获取数据
+                SearchHits hits = searchResponse.getHits();
+                //总数
+                long value = hits.getTotalHits().value;
+                System.out.println("总数量：" + value);
+                System.out.println();
+                SearchHit[] hitsHits = hits.getHits();
+                //遍历数据
+                for (SearchHit hitsHit : hitsHits)
+                {
+                    System.out.println();
+                    //获得id
+                    String id = hitsHit.getId();
+                    //获得得分
+                    float score = hitsHit.getScore();
+                    //获得内容
+                    Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+                    //打印内容
+                    System.out.println("id:" + id);
+                    System.out.println("score:" + score);
+                    System.out.println("内容：");
+                    for (String key : sourceAsMap.keySet())
+                    {
+                        System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+                    }
+                    System.out.println("----------------------------------");
+                }
+            }
+
+            /**
+             * 失败的回调
+             *
+             * @param e Exception
+             */
+            @Override
+            public void onFailure(Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        //休眠2秒
+        Thread.sleep(2000);
+    }
 }
