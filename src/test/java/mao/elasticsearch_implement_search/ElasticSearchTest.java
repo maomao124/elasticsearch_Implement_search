@@ -12,6 +12,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -528,5 +529,136 @@ public class ElasticSearchTest
             }
         });
         Thread.sleep(2000);
+    }
+
+
+    /**
+     * 搜索并排序
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *   "query":
+     *   {
+     *     "match":
+     *     {
+     *       "description": "java"
+     *     }
+     *   },
+     *   "sort":
+     *   [
+     *     {
+     *       "price":
+     *       {
+     *         "order": "desc"
+     *       }
+     *     }
+     *   ]
+     * }
+     *
+     * </pre>
+     * <p>
+     * 结果：
+     * <pre>
+     *
+     * 总数量：4
+     *
+     *
+     * id:3
+     * score:NaN
+     * 内容：
+     * ---- price：78.6
+     * ---- studymodel：201001
+     * ---- name：spring开发基础
+     * ---- description：spring 在java领域非常流行，java程序员都在用。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-24 19:21:35
+     * ---- tags：[spring, java]
+     * ----------------------------------
+     *
+     * id:2
+     * score:NaN
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2019-08-25 19:11:35
+     * ---- tags：[java, dev]
+     * ----------------------------------
+     *
+     * id:5
+     * score:NaN
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2022-5-25 19:11:35
+     * ---- tags：[bootstrap, dev]
+     * ----------------------------------
+     *
+     * id:6
+     * score:NaN
+     * 内容：
+     * ---- price：68.6
+     * ---- studymodel：201001
+     * ---- name：java编程思想
+     * ---- description：java语言是世界第一编程语言，在软件开发领域使用人数最多。
+     * ---- pic：group1/M00/00/00/wKhlQFs6RCeAY0pHAAJx5ZjNDEM428.jpg
+     * ---- timestamp：2022-5-25 19:11:35
+     * ---- tags：[bootstrap, dev]
+     * ----------------------------------
+     *
+     * </pre>
+     *
+     * @throws Exception Exception
+     */
+    @Test
+    void search_sort() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询某字段
+        searchSourceBuilder.query(QueryBuilders.matchQuery("description", "java"));
+        //排序
+        searchSourceBuilder.sort("price", SortOrder.DESC);
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起请求
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        //获取数据
+        SearchHits hits = searchResponse.getHits();
+        //总数
+        long value = hits.getTotalHits().value;
+        System.out.println("总数量：" + value);
+        System.out.println();
+        SearchHit[] hitsHits = hits.getHits();
+        //遍历数据
+        for (SearchHit hitsHit : hitsHits)
+        {
+            System.out.println();
+            //获得id
+            String id = hitsHit.getId();
+            //获得得分
+            float score = hitsHit.getScore();
+            //获得内容
+            Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+            //打印内容
+            System.out.println("id:" + id);
+            System.out.println("score:" + score);
+            System.out.println("内容：");
+            for (String key : sourceAsMap.keySet())
+            {
+                System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+            }
+            System.out.println("----------------------------------");
+        }
     }
 }
