@@ -3781,4 +3781,100 @@ public class ElasticSearchTest
             System.out.println("----------------------------------");
         }
     }
+
+
+    /**
+     * regexp query ，异步请求
+     * 正则查询
+     * 查询某字段满足某正则表达式的所有数据
+     *
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *     "query":
+     *     {
+     *       "regexp":
+     *       {
+     *         "description":
+     *         {
+     *           "value": "j.*a",
+     *           "flags": "ALL"
+     *         }
+     *       }
+     *     }
+     * }
+     *
+     * </pre>
+     * @throws Exception
+     */
+    @Test
+    void search_regexp_query_async() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询
+        searchSourceBuilder.query(QueryBuilders.regexpQuery("description","j.*a"));
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起异步请求
+        client.searchAsync(searchRequest, RequestOptions.DEFAULT, new ActionListener<SearchResponse>()
+        {
+            /**
+             * 成功的回调
+             *
+             * @param searchResponse SearchResponse
+             */
+            @Override
+            public void onResponse(SearchResponse searchResponse)
+            {
+                //获取数据
+                SearchHits hits = searchResponse.getHits();
+                //总数
+                long value = hits.getTotalHits().value;
+                System.out.println("总数量：" + value);
+                float maxScore = hits.getMaxScore();
+                System.out.println("最大分数：" + maxScore);
+                System.out.println();
+                SearchHit[] hitsHits = hits.getHits();
+                //遍历数据
+                for (SearchHit hitsHit : hitsHits)
+                {
+                    System.out.println();
+                    //获得id
+                    String id = hitsHit.getId();
+                    //获得得分
+                    float score = hitsHit.getScore();
+                    //获得内容
+                    Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+                    //打印内容
+                    System.out.println("id:" + id);
+                    System.out.println("score:" + score);
+                    System.out.println("内容：");
+                    for (String key : sourceAsMap.keySet())
+                    {
+                        System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+                    }
+                    System.out.println("----------------------------------");
+                }
+            }
+
+            /**
+             * 失败的回调
+             *
+             * @param e Exception
+             */
+            @Override
+            public void onFailure(Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        //休眠2秒
+        Thread.sleep(2000);
+    }
 }
