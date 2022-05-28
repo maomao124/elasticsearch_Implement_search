@@ -2040,7 +2040,7 @@ public class ElasticSearchTest
      * }
      *
      * </pre>
-     *
+     * <p>
      * 结果：
      * <pre>
      *
@@ -2094,5 +2094,107 @@ public class ElasticSearchTest
             }
             System.out.println("----------------------------------");
         }
+    }
+
+
+    /**
+     * term query ,异步请求
+     * 字段为keyword时，存储和搜索都不分词
+     * 请求内容：
+     * <pre>
+     *
+     * GET /book/_search
+     * {
+     *     "query":
+     *     {
+     *       "term":
+     *       {
+     *         "description":
+     *         {
+     *           "value": "java程序员"
+     *         }
+     *       }
+     *     }
+     * }
+     *
+     * </pre>
+     * <p>
+     * 结果：
+     * <pre>
+     *
+     * 总数量：0
+     * 最大分数：NaN
+     *
+     * </pre>
+     *
+     * @throws Exception Exception
+     */
+    @Test
+    void search_term_query_async() throws Exception
+    {
+        //构建搜索请求
+        SearchRequest searchRequest = new SearchRequest("book");
+        //构建请求体
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询
+        searchSourceBuilder.query(QueryBuilders.termQuery("description", "java程序员"));
+        //放入请求中
+        searchRequest.source(searchSourceBuilder);
+        //发起异步请求
+        client.searchAsync(searchRequest, RequestOptions.DEFAULT, new ActionListener<SearchResponse>()
+        {
+            /**
+             * 成功的回调
+             *
+             * @param searchResponse SearchResponse
+             */
+            @Override
+            public void onResponse(SearchResponse searchResponse)
+            {
+                //获取数据
+                SearchHits hits = searchResponse.getHits();
+                //总数
+                long value = hits.getTotalHits().value;
+                System.out.println("总数量：" + value);
+                float maxScore = hits.getMaxScore();
+                System.out.println("最大分数：" + maxScore);
+                System.out.println();
+                SearchHit[] hitsHits = hits.getHits();
+                //遍历数据
+                for (SearchHit hitsHit : hitsHits)
+                {
+                    System.out.println();
+                    //获得id
+                    String id = hitsHit.getId();
+                    //获得得分
+                    float score = hitsHit.getScore();
+                    //获得内容
+                    Map<String, Object> sourceAsMap = hitsHit.getSourceAsMap();
+
+                    //打印内容
+                    System.out.println("id:" + id);
+                    System.out.println("score:" + score);
+                    System.out.println("内容：");
+                    for (String key : sourceAsMap.keySet())
+                    {
+                        System.out.println("---- " + key + "：" + sourceAsMap.get(key));
+                    }
+                    System.out.println("----------------------------------");
+                }
+            }
+
+            /**
+             * 失败的回调
+             *
+             * @param e Exception
+             */
+            @Override
+            public void onFailure(Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        //休眠2秒
+        Thread.sleep(2000);
     }
 }
